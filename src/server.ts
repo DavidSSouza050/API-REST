@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from "express"
+import { ZodError } from "zod"
 
 import { routes } from "./routes" // por padrão, já é entendido que o arquivo que será importado será o index
 
@@ -26,6 +27,14 @@ app.use((error: any, request: Request, response: Response, _: NextFunction) => {
     response.status(error.statusCode).json({message: error.message})
     return
   }
+
+  if(error instanceof ZodError){
+   response
+    .status(400)
+    .json({message: "Validation error!", issues: error.format()})
+    return
+  }
+
   response.status(500).json({message: error.message})
   return
 })
